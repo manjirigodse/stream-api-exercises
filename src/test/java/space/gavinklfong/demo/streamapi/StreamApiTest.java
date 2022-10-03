@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -26,10 +28,10 @@ import space.gavinklfong.demo.streamapi.repos.CustomerRepo;
 import space.gavinklfong.demo.streamapi.repos.OrderRepo;
 import space.gavinklfong.demo.streamapi.repos.ProductRepo;
 
-@Slf4j
 @DataJpaTest
 public class StreamApiTest {
 
+	Logger log = LoggerFactory.getLogger(StreamApiTest.class);
 	@Autowired
 	private CustomerRepo customerRepo;
 
@@ -137,6 +139,8 @@ public class StreamApiTest {
 		.distinct()
 		.collect(Collectors.toList());
 
+		System.out.println("Result = " + result);
+
 		long endTime = System.currentTimeMillis();
 		log.info(String.format("exercise 4 - execution time: %1$d ms", (endTime - startTime)));
 		result.forEach(o -> log.info(o.toString()));
@@ -190,6 +194,8 @@ public class StreamApiTest {
 				.distinct()
 				.collect(Collectors.toList());
 
+		System.out.println("Result = " + result);
+
 		long endTime = System.currentTimeMillis();
 		log.info(String.format("exercise 7 - execution time: %1$d ms", (endTime - startTime)));
 		result.forEach(o -> log.info(o.toString()));
@@ -206,6 +212,7 @@ public class StreamApiTest {
 				.flatMap(o -> o.getProducts().stream())
 				.mapToDouble(Product::getPrice)
 				.sum();
+		System.out.println("Result " +result);
 
 		long endTime = System.currentTimeMillis();
 		log.info(String.format("exercise 8 - execution time: %1$d ms", (endTime - startTime)));
@@ -394,8 +401,18 @@ public class StreamApiTest {
 								Product::getCategory,
 								Collectors.collectingAndThen(
 										Collectors.maxBy(Comparator.comparingDouble(Product::getPrice)),
-										optionalProduct -> optionalProduct.map(Product::getName).orElse(null)
+										optionalProduct -> {
+//											if (optionalProduct.isPresent())
+//												return optionalProduct.get().getName();
+//											else return null;
+
+											return optionalProduct
+													.map(Product::getName)
+													.orElse(null);
+
+										}
 								)
+
 						));
 		long endTime = System.currentTimeMillis();
 		log.info(String.format("exercise 15a - execution time: %1$d ms", (endTime - startTime)));
